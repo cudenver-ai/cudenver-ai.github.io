@@ -40,7 +40,7 @@ export default function Hero() {
               color: "text.primary",
             }}
           >
-            Welcome to the Decoy Challenge!
+            Welcome to the D.E.C.O.Y. Challenge!
           </Typography>
           <Typography
             sx={{
