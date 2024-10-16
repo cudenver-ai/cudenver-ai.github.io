@@ -4,18 +4,13 @@ import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
 import MuiToolbar from "@mui/material/Toolbar";
 import { tabsClasses } from "@mui/material/Tabs";
-import Typography from "@mui/material/Typography";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import SideMenuMobile from "./SideMenuMobile";
 import MenuButton from "./MenuButton";
 import ColorModeIconDropdown from "../../theme/ColorModeIconDropdown";
 import logo from "../assets/club.png";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import { useColorScheme } from "@mui/material/styles";
 import { Container } from "@mui/material";
 
@@ -151,6 +146,7 @@ export function CustomIcon() {
           width: "3rem",
           height: "3rem",
           filter: mode === "dark" ? "invert(100%)" : "none",
+          transition: "filter 0.3s ease",
         }}
       />
     </Box>
