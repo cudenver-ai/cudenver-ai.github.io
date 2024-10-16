@@ -4,7 +4,8 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 export default function Hero() {
   const vpn =
     "https://www.ucdenver.edu/docs/default-source/offices-oit-documents/how-to-documents/vpnaccess.pdf?sfvrsn=e96ca2ba_4";
@@ -19,12 +20,12 @@ export default function Hero() {
       >
         <Stack
           container
-          spacing={2}
+          spacing={1}
           columns={12}
           sx={{ mb: (theme) => theme.spacing(2) }}
         >
           <Typography
-            variant="h1"
+            variant="h3"
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -35,6 +36,7 @@ export default function Hero() {
             AI&nbsp;Student Association&nbsp;
           </Typography>
           <Typography
+            fontSize={18}
             sx={{
               textAlign: "center",
               color: "text.primary",
@@ -48,7 +50,7 @@ export default function Hero() {
               color: "text.secondary",
             }}
           >
-            Compete, Learn, and Outsmart AI Models in this Exciting Challenge!
+            Compete, Learn, and Outsmart AI Models
           </Typography>
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -71,6 +73,20 @@ export default function Hero() {
             >
               Challenge Website
             </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                boxShadow: "0 3px 10px rgba(0,0,0,0.2)",
+                fontSize: "1.2rem",
+              }}
+              href="https://discord.com/invite/VG28u28bwK"
+            >
+              Discord Server
+            </Button>
           </Stack>
           <Box
             sx={{
@@ -81,10 +97,10 @@ export default function Hero() {
             }}
           >
             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-              Issues accesing the site?
+              Accesing the Website
             </Typography>
             <Typography variant="body1" fontSize={18} lineHeight={1.8}>
-              <ul style={{ paddingLeft: "20px" }}>
+              <ul style={{ paddingLeft: "30px" }}>
                 <li>
                   <strong>On Campus: </strong>
                   Please connect to <strong>"AurariaNet"</strong>
@@ -92,10 +108,24 @@ export default function Hero() {
                 </li>
                 <li>
                   <strong>Off Campus: </strong>
-                  Please connect to VPN if you are off-campus.{" "}
+                  Please connect to <strong>VPN</strong> if you are off-campus.{" "}
                   <a href={vpn}> VPN Guide</a>{" "}
                 </li>
+                <li>
+                  <strong>Discord: </strong>
+                  Join our discord: For more questions and help, join our
+                  Discord server.
+                </li>
               </ul>
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+              <strong>Certificate Warning ?</strong>
+              {""} <WarningAmberIcon />
+            </Typography>
+            <Typography variant="h7" sx={{}}>
+              {" "}
+              Some users may see a certificate warning when using HTTPS. Feel
+              free to proceed with accepting the certification; it is safe!
             </Typography>
           </Box>
         </Stack>
