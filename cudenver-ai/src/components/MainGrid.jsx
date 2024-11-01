@@ -108,8 +108,10 @@ export default function MainGrid({ setCurrentPage }) {
           lg: "1900px",
           xl: "2100px",
         },
+        minWidth: "1200px",
         mx: "auto",
         px: 2,
+        overflowX: "auto",
         overflow: "hidden",
       }}
     >
@@ -143,9 +145,7 @@ export default function MainGrid({ setCurrentPage }) {
               <Typography variant="body1" fontSize={18} lineHeight={1.8}>
                 Please upload your file in .pkl format,
               </Typography>
-              <Box sx={{ mt: 2, mb: 2 }}>
-                <HighlightedCardDisabled />
-              </Box>
+              <Box sx={{ mt: 2, mb: 2 }}></Box>
               <Typography variant="body1" sx={{ mt: 2 }}>
                 *All metrics below are updated every hour.
               </Typography>
@@ -260,26 +260,21 @@ export default function MainGrid({ setCurrentPage }) {
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(50px)",
         transition: "all 0.6s ease",
+        minWidth: "1200px",
         width: "100%",
-        maxWidth: {
-          xs: "100%",
-          sm: "100%",
-          md: "1700px",
-          lg: "1900px",
-          xl: "2100px",
-        },
         mx: "auto",
         px: 2,
-        overflow: "hidden",
+        overflowX: "auto",
+        overflowY: "hidden",
       }}
     >
       <Grid
         container
         spacing={2}
         columns={12}
-        sx={{ mb: (theme) => theme.spacing(2) }}
+        sx={{ mb: (theme) => theme.spacing(2), minWidth: "1200px" }}
       >
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid item size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
           <SyledCard sx={{ height: "100%" }}>
             <SyledCardContent>
               <Typography variant="h4" sx={{ fontWeight: "bold" }}>
@@ -324,7 +319,7 @@ export default function MainGrid({ setCurrentPage }) {
               </Box>
               <Typography variant="body1" sx={{ mt: 2 }}>
                 *All metrics below are updated every hour. Last update:{" "}
-                {"11:59:59 PM"}
+                {"October 30th 11:59:59 PM"}
               </Typography>
             </SyledCardContent>
           </SyledCard>

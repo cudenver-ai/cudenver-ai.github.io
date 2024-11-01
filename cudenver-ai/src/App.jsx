@@ -34,8 +34,10 @@ export default function Dashboard(props) {
         {currentPage === "main" && <MainGrid setCurrentPage={setCurrentPage} />}
         {currentPage === "data" && <GettingStartedPage />}
         {currentPage === "organizers" && <OrganizersPage />}
-        {currentPage === "problem" && <ProblemPage />}
-        {currentPage === "home" && <HomePage />}
+        {currentPage === "problem" && (
+          <ProblemPage setCurrentPage={setCurrentPage} />
+        )}
+        {currentPage === "home" && <HomePage setCurrentPage={setCurrentPage} />}
       </Container>
       <Copyright sx={{ my: 4 }} />
     </AppTheme>

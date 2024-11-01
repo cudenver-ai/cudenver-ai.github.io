@@ -94,7 +94,6 @@ export default function SessionsChart() {
 
     const [visitsMetric, uploadsMetric, uniqueMetric] = visitsData;
 
-    // Calculate percentage change for Visits
     const visitsDataLength = visitsMetric.data.length;
     const visitsLast = visitsMetric.data[visitsDataLength - 1];
     const visitsSecondLast = visitsMetric.data[visitsDataLength - 2];
@@ -103,7 +102,6 @@ export default function SessionsChart() {
         ? ((visitsLast - visitsSecondLast) / visitsSecondLast) * 100
         : 0;
 
-    // Calculate percentage change for Uploads
     const uploadsDataLength = uploadsMetric.data.length;
     const uploadsLast = uploadsMetric.data[uploadsDataLength - 1];
     const uploadsSecondLast = uploadsMetric.data[uploadsDataLength - 2];
@@ -112,7 +110,6 @@ export default function SessionsChart() {
         ? ((uploadsLast - uploadsSecondLast) / uploadsSecondLast) * 100
         : 0;
 
-    // Calculate percentage change for Unique Visitors
     const uniqueDataLength = uniqueMetric.data.length;
     const uniqueLast = uniqueMetric.data[uniqueDataLength - 1];
     const uniqueSecondLast = uniqueMetric.data[uniqueDataLength - 2];
@@ -141,7 +138,7 @@ export default function SessionsChart() {
       <CardContent
         sx={{ display: "flex", flexDirection: "column", height: "100%" }}
       >
-        <Typography component="h2" variant="subtitle" gutterBottom>
+        <Typography component="h2" variant="h4" gutterBottom>
           Site Metrics
         </Typography>
         <Stack
@@ -160,6 +157,8 @@ export default function SessionsChart() {
           >
             <Typography component="h2" variant="subtitle1">
               All Visits:
+            </Typography>
+            <Typography component="h2" variant="bold">
               {visitsData.length > 0
                 ? visitsData[0].data.reduce((acc, curr) => acc + curr, 0)
                 : 0}
@@ -183,6 +182,8 @@ export default function SessionsChart() {
           >
             <Typography component="h2" variant="subtitle1">
               Total Uploads:
+            </Typography>
+            <Typography component="h2" variant="bold">
               {visitsData.length > 1
                 ? visitsData[1].data.reduce((acc, curr) => acc + curr, 0)
                 : 0}
@@ -205,6 +206,8 @@ export default function SessionsChart() {
           >
             <Typography component="h2" variant="subtitle1">
               Unique Visits:
+            </Typography>
+            <Typography component="h2" variant="bold">
               {visitsData.length > 2
                 ? visitsData[2].data.reduce((acc, curr) => acc + curr, 0)
                 : 0}
@@ -216,6 +219,9 @@ export default function SessionsChart() {
             />
           </Stack>
         </Stack>
+        <Typography component="h4" variant="subtitle2">
+          Last 2 Days Percentage Change
+        </Typography>
 
         <LineChart
           colors={colorPalette}
