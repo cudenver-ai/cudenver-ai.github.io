@@ -103,7 +103,7 @@ export default function AppNavbar({ setCurrentPage }) {
                 component="h2"
                 sx={{ color: 'text.primary' }}
               >
-                Decoy Challenge
+                Decoy Challenge - Results
               </Typography>
 
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
