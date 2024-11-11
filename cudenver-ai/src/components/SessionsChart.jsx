@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react";
-import PropTypes from "prop-types";
-import { useTheme } from "@mui/material/styles";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import { LineChart } from "@mui/x-charts/LineChart";
+import React, { useState, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
+import { useTheme } from '@mui/material/styles';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import { LineChart } from '@mui/x-charts/LineChart';
+import { API_BASE_URL } from '../config.js';
 
 function AreaGradient({ color, id }) {
   return (
@@ -26,8 +27,8 @@ AreaGradient.propTypes = {
 
 function getDaysInMonth(month, year) {
   const date = new Date(year, month, 0);
-  const monthName = date.toLocaleDateString("en-US", {
-    month: "short",
+  const monthName = date.toLocaleDateString('en-US', {
+    month: 'short',
   });
   const daysInMonth = date.getDate();
   const days = [];
@@ -42,48 +43,8 @@ function getDaysInMonth(month, year) {
 export default function SessionsChart() {
   const theme = useTheme();
   const daysInMonth = getDaysInMonth(10, 2024);
-  const [visitsData, setVisitsData] = useState([
-    {
-      id: "Visits",
-      label: "Visits",
-      showMark: false,
-      curve: "linear",
-      stack: "total",
-      area: true,
-      stackOrder: "ascending",
-      data: [
-        30, 58, 68, 98, 80, 27, 107, 33, 9, 158, 18, 1, 3, 15, 33, 40, 19, 48,
-        55, 57, 65, 90, 43, 100, 65, 36, 23, 36, 101, 142,
-      ],
-    },
-    {
-      id: "Uploads",
-      label: "Uploads",
-      showMark: false,
-      curve: "linear",
-      stack: "total",
-      area: true,
-      stackOrder: "ascending",
-      data: [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 6, 1, 7, 0, 4, 8, 7, 20, 15, 27, 15, 33,
-        33, 49, 15, 49, 8, 11, 62, 43,
-      ],
-    },
-    {
-      id: "Unique",
-      label: "Unique Visitors",
-      showMark: false,
-      curve: "linear",
-      stack: "total",
-      area: true,
-      stackOrder: "ascending",
-      data: [
-        6, 14, 13, 13, 4, 4, 9, 6, 7, 33, 4, 1, 2, 10, 16, 11, 8, 8, 3, 5, 20,
-        20, 13, 31, 13, 9, 8, 19, 23, 27,
-      ],
-    },
-  ]);
-  const [loading, setLoading] = useState(false);
+  const [visitsData, setVisitsData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Updated useMemo to calculate percentage changes for all three metrics
   const percentageChange = useMemo(() => {
@@ -94,29 +55,23 @@ export default function SessionsChart() {
 
     const [visitsMetric, uploadsMetric, uniqueMetric] = visitsData;
 
+    // Calculate percentage change for Visits
     const visitsDataLength = visitsMetric.data.length;
     const visitsLast = visitsMetric.data[visitsDataLength - 1];
     const visitsSecondLast = visitsMetric.data[visitsDataLength - 2];
-    const changeVisits =
-      visitsSecondLast !== 0
-        ? ((visitsLast - visitsSecondLast) / visitsSecondLast) * 100
-        : 0;
+    const changeVisits = visitsSecondLast !== 0 ? ((visitsLast - visitsSecondLast) / visitsSecondLast) * 100 : 0;
 
+    // Calculate percentage change for Uploads
     const uploadsDataLength = uploadsMetric.data.length;
     const uploadsLast = uploadsMetric.data[uploadsDataLength - 1];
     const uploadsSecondLast = uploadsMetric.data[uploadsDataLength - 2];
-    const changeUploads =
-      uploadsSecondLast !== 0
-        ? ((uploadsLast - uploadsSecondLast) / uploadsSecondLast) * 100
-        : 0;
+    const changeUploads = uploadsSecondLast !== 0 ? ((uploadsLast - uploadsSecondLast) / uploadsSecondLast) * 100 : 0;
 
+    // Calculate percentage change for Unique Visitors
     const uniqueDataLength = uniqueMetric.data.length;
     const uniqueLast = uniqueMetric.data[uniqueDataLength - 1];
     const uniqueSecondLast = uniqueMetric.data[uniqueDataLength - 2];
-    const changeUnique =
-      uniqueSecondLast !== 0
-        ? ((uniqueLast - uniqueSecondLast) / uniqueSecondLast) * 100
-        : 0;
+    const changeUnique = uniqueSecondLast !== 0 ? ((uniqueLast - uniqueSecondLast) / uniqueSecondLast) * 100 : 0;
 
     return {
       visits: Math.ceil(changeVisits),
@@ -131,41 +86,53 @@ export default function SessionsChart() {
     theme.palette.primary.dark,
   ];
 
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/visits`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setVisitsData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching eval data:', error);
+      });
+  }, []);
+
   return loading ? (
-    <Typography align={"center"}>Loading...</Typography>
+    <Typography align={'center'}>Loading...</Typography>
   ) : (
-    <Card variant="outlined" sx={{ width: "100%", height: "100%" }}>
+    <Card variant="outlined" sx={{ width: '100%', height: '100%' }}>
       <CardContent
-        sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+        sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
       >
-        <Typography component="h2" variant="h4" gutterBottom>
+        <Typography component="h2" variant="subtitle" gutterBottom>
           Site Metrics
         </Typography>
-        <Stack
-          direction="row"
-          sx={{ justifyContent: "space-between", gap: 3, mb: 1 }}
-        >
+        <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 3, mb: 1 }}>
           {/* Visits Summary */}
           <Stack
             direction="row"
             sx={{
-              alignContent: { xs: "center", sm: "flex-start" },
-              alignItems: "center",
+              alignContent: { xs: 'center', sm: 'flex-start' },
+              alignItems: 'center',
               gap: 1,
               mb: 1,
             }}
           >
             <Typography component="h2" variant="subtitle1">
-              All Visits:
-            </Typography>
-            <Typography component="h2" variant="bold">
+              All Visits: 
               {visitsData.length > 0
                 ? visitsData[0].data.reduce((acc, curr) => acc + curr, 0)
                 : 0}
             </Typography>
             <Chip
               size="small"
-              color={percentageChange.visits >= 0 ? "success" : "error"}
+              color={percentageChange.visits >= 0 ? 'success' : 'error'}
               label={`${percentageChange.visits}%`}
             />
           </Stack>
@@ -174,23 +141,21 @@ export default function SessionsChart() {
           <Stack
             direction="row"
             sx={{
-              alignContent: { xs: "center", sm: "flex-start" },
-              alignItems: "center",
+              alignContent: { xs: 'center', sm: 'flex-start' },
+              alignItems: 'center',
               gap: 1,
               mb: 1,
             }}
           >
             <Typography component="h2" variant="subtitle1">
-              Total Uploads:
-            </Typography>
-            <Typography component="h2" variant="bold">
-              {visitsData.length > 1
+              Total Uploads: 
+               {visitsData.length > 1
                 ? visitsData[1].data.reduce((acc, curr) => acc + curr, 0)
                 : 0}
             </Typography>
             <Chip
               size="small"
-              color={percentageChange.uploads >= 0 ? "success" : "error"}
+              color={percentageChange.uploads >= 0 ? 'success' : 'error'}
               label={`${percentageChange.uploads}%`}
             />
           </Stack>
@@ -199,35 +164,31 @@ export default function SessionsChart() {
           <Stack
             direction="row"
             sx={{
-              alignContent: { xs: "center", sm: "flex-start" },
-              alignItems: "center",
+              alignContent: { xs: 'center', sm: 'flex-start' },
+              alignItems: 'center',
               gap: 1,
             }}
           >
             <Typography component="h2" variant="subtitle1">
-              Unique Visits:
-            </Typography>
-            <Typography component="h2" variant="bold">
-              {visitsData.length > 2
+              Unique Visits: 
+               { visitsData.length > 2
                 ? visitsData[2].data.reduce((acc, curr) => acc + curr, 0)
                 : 0}
             </Typography>
             <Chip
               size="small"
-              color={percentageChange.unique >= 0 ? "success" : "error"}
+              color={percentageChange.unique >= 0 ? 'success' : 'error'}
               label={`${percentageChange.unique}%`}
             />
           </Stack>
         </Stack>
-        <Typography component="h4" variant="subtitle2">
-          Last 2 Days Percentage Change
-        </Typography>
+
 
         <LineChart
           colors={colorPalette}
           xAxis={[
             {
-              scaleType: "point",
+              scaleType: 'point',
               data: daysInMonth,
               tickInterval: (index, i) => (i + 1) % 5 === 0,
             },
@@ -237,13 +198,13 @@ export default function SessionsChart() {
           margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
           grid={{ horizontal: true }}
           sx={{
-            "& .MuiAreaElement-series-uploads": {
+            '& .MuiAreaElement-series-uploads': {
               fill: "url('#uploads')",
             },
-            "& .MuiAreaElement-series-visits": {
+            '& .MuiAreaElement-series-visits': {
               fill: "url('#visits')",
             },
-            "& .MuiAreaElement-series-unique": {
+            '& .MuiAreaElement-series-unique': {
               fill: "url('#unique')",
             },
           }}

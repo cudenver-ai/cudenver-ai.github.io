@@ -1,65 +1,47 @@
-import React, { useState, useEffect } from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
-import StarIcon from "@mui/icons-material/Star";
-import GradeIcon from "@mui/icons-material/Grade";
+import React, { useState, useEffect } from 'react';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
+import StarIcon from '@mui/icons-material/Star';
+import GradeIcon from '@mui/icons-material/Grade';
+import { API_BASE_URL } from '../config.js';
 
 export default function Leaderboard() {
-  const [leaderboardData, setLeaderboardData] = useState([
-    {
-      rank: 1,
-      team: "W's Only",
-      score: 0.8202,
-    },
-    {
-      rank: 2,
-      team: "NSBE",
-      score: 0.82,
-    },
-    {
-      rank: 3,
-      team: "Nika",
-      score: 0.8183,
-    },
-    {
-      rank: 4,
-      team: "AI Posers",
-      score: 0.8159,
-    },
-    {
-      rank: 5,
-      team: "Hung Nguyen",
-      score: 0.8141,
-    },
-  ]);
+  const [leaderboardData, setLeaderboardData] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/leaderboard`)
+      .then((response) => response.json())
+      .then((data) => setLeaderboardData(data))
+      .catch((error) => console.error('Error fetching leaderboard:', error));
+  }, []);
 
   const getRankIcon = (rank) => {
     if (rank === 1) {
-      return <EmojiEventsIcon sx={{ color: "gold" }} />;
+      return <EmojiEventsIcon sx={{ color: 'gold' }} />;
     } else if (rank === 2) {
-      return <MilitaryTechIcon sx={{ color: "silver" }} />;
+      return <MilitaryTechIcon sx={{ color: 'silver' }} />;
     } else if (rank === 3) {
-      return <MilitaryTechIcon sx={{ color: "bronze" }} />;
+      return <MilitaryTechIcon sx={{ color: 'bronze' }} />;
     } else if (rank === 4) {
-      return <StarIcon sx={{ color: "purple" }} />;
+      return <StarIcon sx={{ color: 'purple' }} />;
     } else if (rank === 5) {
-      return <GradeIcon sx={{ color: "blue" }} />;
+      return <GradeIcon sx={{ color: 'blue' }} />;
     }
     return null;
   };
 
   return (
-    <Card variant="outlined" sx={{ width: "100%" }}>
+    <Card variant="outlined" sx={{ width: '100%' }}>
       <CardContent>
         <Typography component="h2" variant="subtitle" gutterBottom>
           Leaderboard: Top 5

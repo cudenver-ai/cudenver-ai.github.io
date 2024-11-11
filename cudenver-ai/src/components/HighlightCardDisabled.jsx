@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import { API_BASE_URL } from '../config.js';
 import Box from '@mui/material/Box';
 
-export default function HighlightedCard() {
+export default function HighlightedCardDisabled() {
   const [file, setFile] = useState(null);
   const [teamName, setTeamName] = useState('');
 
@@ -70,15 +70,17 @@ export default function HighlightedCard() {
         accept=".pkl"
         onChange={handleFileUpload}
         style={{ display: 'block', marginBottom: '16px', marginTop: '16px' }}
+        disabled={'true'}
       />
       <Button
         onClick={handleSubmit}
         variant="contained"
         size="Large"
-        color="primary"
+        color=""
+        disabled={'true'}
         endIcon={<ChevronRightRoundedIcon />}
       >
-        Upload
+        Loading...
       </Button>
     </Box>
   );
