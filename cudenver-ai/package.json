@@ -1,13 +1,13 @@
 {
-  "name": "front-end",
+  "name": "cudenver-ai",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode dev",
-    "build": "vite build --mode prod",
-    "preview": "vite preview --port 5000",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\""
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "latest",

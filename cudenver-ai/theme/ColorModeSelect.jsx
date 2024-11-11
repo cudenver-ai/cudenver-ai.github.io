@@ -6,11 +6,13 @@ import { useEffect } from "react";
 
 export default function ColorModeSelect(props) {
   const { mode, setMode } = useColorScheme();
+
   useEffect(() => {
     if (mode !== "light") {
       setMode("light");
     }
   }, [mode, setMode]);
+
   if (!mode) {
     return null;
   }

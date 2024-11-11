@@ -1,35 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid2';
-import CardMedia from '@mui/material/CardMedia';
-import panda from '../assets/panda.png';
-import gibbon from '../assets/gibbon.png';
-import Button from '@mui/material/Button';
-import { useInView } from 'react-intersection-observer';
-import HeroBanner from '../components/HeroBanner.jsx';
+import React, { useState, useEffect } from "react";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid2";
+import CardMedia from "@mui/material/CardMedia";
+import panda from "../assets/panda.png";
+import gibbon from "../assets/gibbon.png";
+import Button from "@mui/material/Button";
+import { useInView } from "react-intersection-observer";
+import HeroBanner from "../components/HeroBanner.jsx";
+import PropTypes from "prop-types";
 
-export default function HomePage() {
+export default function HomePage({ setCurrentPage }) {
   const { ref, inView } = useInView({ triggerOnce: true });
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <Box
       ref={ref}
       sx={{
         opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(50px)',
-        transition: 'all 0.6s ease',
-        width: '100%',
+        transform: inView ? "translateY(0)" : "translateY(50px)",
+        transition: "all 0.6s ease",
+        width: "100%",
         maxWidth: {
-          xs: '100%',
-          sm: '100%',
-          md: '1700px',
-          lg: '1900px',
-          xl: '2100px',
+          xs: "100%",
+          sm: "100%",
+          md: "1700px",
+          lg: "1900px",
+          xl: "2100px",
         },
-        mx: 'auto',
+        mx: "auto",
         px: 2,
-        overflow: 'hidden',
+        overflow: "hidden",
       }}
     >
       <HeroBanner
@@ -45,7 +50,7 @@ export default function HomePage() {
         sx={{ mb: (theme) => theme.spacing(2) }}
       >
         <Grid size={{ sm: 12, md: 6 }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
             Challenge Overview
           </Typography>
 
@@ -55,11 +60,11 @@ export default function HomePage() {
             lineHeight={1.8}
             sx={{ mt: 2 }}
           >
-            We are excited to introduce the{' '}
+            We are excited to introduce the{" "}
             <strong>
               Decoy Challenge: Deceptive Examples to Confuse and Outsmart an AI
             </strong>
-            . This challenge is part of the{' '}
+            . This challenge is part of the{" "}
             <strong>CU Denver Data Science and AI Symposium.</strong>
           </Typography>
           <Typography
@@ -68,12 +73,12 @@ export default function HomePage() {
             lineHeight={1.6}
             sx={{ mt: 2 }}
           >
-            The challenge is simple, we give a{' '}
+            The challenge is simple, we give a{" "}
             <strong>pre-trained model</strong> and a set of images. Your job is
             to trick the model into making incorrect predictions. Trick the
             model, and win a <strong>prize!</strong>.
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, mt: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2, mt: 2 }}>
             Example:
           </Typography>
           <Typography
@@ -93,7 +98,7 @@ export default function HomePage() {
             original for us, but the model is now confidently misclassifying the
             panda as a gibbon with 99.3% confidence. For those who do not know,
             the bottom image is what an actual <strong>Gibbon</strong> looks
-            like. Very different from a Panda.{' '}
+            like. Very different from a Panda.{" "}
           </Typography>
         </Grid>
 
@@ -101,11 +106,11 @@ export default function HomePage() {
           <Box
             sx={{
               my: 15,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
               gap: 2,
-              height: '100%',
+              height: "100%",
             }}
           >
             <CardMedia
@@ -113,12 +118,12 @@ export default function HomePage() {
               image={panda}
               alt="Panda image"
               sx={{
-                borderRadius: '12px',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                width: '100%',
+                borderRadius: "12px",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                width: "100%",
 
-                height: 'auto',
-                objectFit: 'cover',
+                height: "auto",
+                objectFit: "cover",
               }}
             />
 
@@ -127,12 +132,12 @@ export default function HomePage() {
               image={gibbon}
               alt="Gibbon image"
               sx={{
-                borderRadius: '12px',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                width: '100%',
-                maxWidth: '400px',
-                height: 'auto',
-                objectFit: 'cover',
+                borderRadius: "12px",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                width: "100%",
+                maxWidth: "400px",
+                height: "auto",
+                objectFit: "cover",
               }}
             />
           </Box>
@@ -141,20 +146,20 @@ export default function HomePage() {
         <Grid item xs={12} md={6}>
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
             }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
               Introduction
             </Typography>
             <Typography variant="body1" fontSize={18} lineHeight={1.8}>
-              This challenge invites{' '}
+              This challenge invites{" "}
               <strong>all Auraria Campus students</strong> to dive into the
-              intriguing world of <strong>adversarial machine learning</strong>{' '}
+              intriguing world of <strong>adversarial machine learning</strong>{" "}
               by crafting adversarial examples that can deceive a robust machine
-              learning classifier trained on the{' '}
+              learning classifier trained on the{" "}
               <strong>CIFAR-10 dataset</strong>. Your mission is to create
               subtle but effective modifications to a set of test images,
               fooling the classifier into making incorrect predictions. This
@@ -208,20 +213,20 @@ export default function HomePage() {
               real-world applications.
             </Typography>
 
-            <Box sx={{ mt: 'auto', pt: 2 }}>
+            <Box sx={{ mt: "auto", pt: 2 }}>
               <Button
                 variant="contained"
                 color="primary"
                 size="large"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => handlePageChange("main")}
                 sx={{
-                  boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
-                  fontSize: '1.2rem',
+                  boxShadow: "0 3px 10px rgba(0,0,0,0.2)",
+                  fontSize: "1.2rem",
                 }}
-                href="https://forms.office.com/r/Xb3MZjTibT"
               >
-                Join the Challenge
+                View Results
               </Button>
             </Box>
           </Box>
@@ -230,16 +235,16 @@ export default function HomePage() {
         <Grid item xs={12} md={6}>
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
             }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
               Prizes
             </Typography>
             <Typography variant="body1" fontSize={18} lineHeight={1.8}>
-              <ul style={{ paddingLeft: '20px' }}>
+              <ul style={{ paddingLeft: "20px" }}>
                 <li>
                   <strong>1st Place:</strong> $250
                 </li>
@@ -263,17 +268,17 @@ export default function HomePage() {
         <Grid item xs={12} md={6}>
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
               mt: 2,
             }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
               Key Dates
             </Typography>
             <Typography variant="body1" fontSize={18} lineHeight={1.8}>
-              <ul style={{ paddingLeft: '20px' }}>
+              <ul style={{ paddingLeft: "20px" }}>
                 <li>
                   <strong>Challenge Start:</strong> October 1st, 2024
                 </li>
@@ -282,7 +287,7 @@ export default function HomePage() {
                   11:59 PM
                 </li>
                 <li>
-                  <strong>CU Denver Data Science and AI Symposium:</strong>{' '}
+                  <strong>CU Denver Data Science and AI Symposium:</strong>{" "}
                   November 1st, 2024
                 </li>
                 <li>
@@ -297,3 +302,6 @@ export default function HomePage() {
     </Box>
   );
 }
+HomePage.propTypes = {
+  setCurrentPage: PropTypes.func.isRequired,
+};

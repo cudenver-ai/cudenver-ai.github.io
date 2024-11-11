@@ -1,43 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid2';
-import Button from '@mui/material/Button';
-import { useInView } from 'react-intersection-observer';
-import HeroBanner from '../components/HeroBanner.jsx';
-import Prism from 'prismjs';
-import 'prismjs/themes/prism-tomorrow.css';
-import 'prismjs/components/prism-python';
-import { API_BASE_URL } from '../config.js';
-import Divider from '@mui/material/Divider';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import DownloadIcon from '@mui/icons-material/Download';
-import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import React, { useState, useEffect } from "react";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid2";
+import Button from "@mui/material/Button";
+import { useInView } from "react-intersection-observer";
+import HeroBanner from "../components/HeroBanner.jsx";
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
+import "prismjs/components/prism-python";
+import Divider from "@mui/material/Divider";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import DownloadIcon from "@mui/icons-material/Download";
+import { styled } from "@mui/material/styles";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 const StyledCard = styled(Card)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   padding: 0,
-  height: '100%',
+  height: "100%",
   backgroundColor: theme.palette.background.paper,
 }));
 
 const StyledCardContent = styled(CardContent)({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: 4,
   padding: 10,
   flexGrow: 1,
-  '&:last-child': {
+  "&:last-child": {
     paddingBottom: 16,
   },
 });
 
 export default function GettingStartedPage() {
-  const [codeBlocks, setCodeBlocks] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [codeBlocks, setCodeBlocks] = useState({
+    block1: "pip install git+https://github.com/RobustBench/robustbench.git # library for loading robust classifer\npip install foolbox # library for adversarial example generation\npip install timm==1.0.9 # fixes dependency issue with foolbox",
+    block2: "from robustbench.utils import clean_accuracy\nfrom robustbench.utils import load_model\nimport matplotlib.pyplot as plt\nfrom torch import unique\nimport foolbox as fb\nimport numpy as np\nimport pickle\nimport torch\nimport os",
+    block3: "import gdown\noutput_file = 'cifar10.pt'\nfile_id = \"1A5gQCE0bHZhBlfcLQ2fFP5UygpgVkdAX\"\ngdown.download(f\"https://drive.google.com/uc?id={file_id}\", output_file)",
+    block4: "cifar_data = torch.load('cifar10.pt')",
+    block5: "# Extract the images and labels tensors\nx_test = cifar_data['images']\ny_test = cifar_data['labels']\n\nprint(unique(y_test, return_counts=True))",
+    block6: "print(x_test.shape, y_test.shape)\nprint(torch.max(x_test), torch.min(x_test))",
+    block7: "model = load_model(model_name='Kireev2021Effectiveness_RLATAugMix', dataset='cifar10', threat_model='corruptions')",
+    block8: "# Check if GPU is available and set the device accordingly\nif torch.cuda.is_available():\n    device = torch.device('cuda')\n    print(\"Using GPU:\", torch.cuda.get_device_name(0))\nelse:\n    device = torch.device('cpu')\n    print(\"Using CPU\")\n\nmodel = model.to(device)\nx_test = x_test.to(device)\ny_test = y_test.to(device)",
+    block9: "model_fb = fb.PyTorchModel(model, bounds=(0, 1))",
+    block10: "_, advs, success = fb.attacks.LinfPGD(rel_stepsize=0.1, steps=20)(model_fb, x_test, y_test, epsilons=[8/255])",
+    block11: "print('Robust accuracy: {:.1%}'.format(1 - success.float().mean()))\nprint(clean_accuracy(model, x_test, y_test))",
+    block12: "import torch\nimport matplotlib.pyplot as plt\nimport random\n\n# Pass the perturbed images through the model to get the predicted labels\nwith torch.no_grad():  # No need to track gradients during inference\n    logits_adv = model(advs[0].to('cuda'))  # Get the logits for the adversarial examples\n\n# Get the predicted labels from the logits\npredicted_labels_adv = torch.argmax(logits_adv, dim=1)\n\n# Find which examples were misclassified (where predicted label != true label)\nmisclassified_indices = (predicted_labels_adv != y_test.to('cuda')).nonzero(as_tuple=True)[0]\n\n# Get the misclassified original and perturbed images, true labels, and incorrect labels\nmisclassified_images = advs[0][misclassified_indices]\nmisclassified_original_images = x_test.to('cuda')[misclassified_indices]\nmisclassified_predicted_labels = predicted_labels_adv[misclassified_indices]\nmisclassified_true_labels = y_test.to('cuda')[misclassified_indices]\n\n# Choose a random subset of misclassified images to display\nnum_images_to_show = min(10, len(misclassified_images))  # Limit to 10 images for display\nrandom_indices = random.sample(range(len(misclassified_images)), num_images_to_show)\n\n# Class names (assuming CIFAR-10)\nclass_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',\n               'dog', 'frog', 'horse', 'ship', 'truck']\n\n# Plot the original and misclassified perturbed images side by side\nplt.figure(figsize=(25, 5))\nfor i, idx in enumerate(random_indices):\n    # Original image\n    original_image = misclassified_original_images[idx]\n    true_label = misclassified_true_labels[idx].item()\n\n    # Perturbed image\n    perturbed_image = misclassified_images[idx]\n    incorrect_label = misclassified_predicted_labels[idx].item()\n\n    # Convert images from tensor to numpy and transpose from (C, H, W) to (H, W, C)\n    original_img = original_image.permute(1, 2, 0).cpu().numpy()\n    perturbed_img = perturbed_image.permute(1, 2, 0).cpu().numpy()\n\n    # Plot original image\n    plt.subplot(2, num_images_to_show, i+1)\n    plt.imshow(original_img, interpolation='none')\n    plt.title(f\"Original: {class_names[true_label]}\")\n    plt.axis('off')\n\n    # Plot perturbed (misclassified) image\n    plt.subplot(2, num_images_to_show, num_images_to_show + i + 1)\n    plt.imshow(perturbed_img, interpolation='none')\n    plt.title(f\"Perturbed: {class_names[incorrect_label]}\")\n    plt.axis('off')\n\nplt.tight_layout()\nplt.show()\n",
+    block13: "# Create the 'challenge' directory if it doesn't exist\nos.makedirs('challenge', exist_ok=True)\n\n# Path to save the adversarial examples\nfile_path = os.path.join('challenge', 'advs.pkl')\n\n# Save the 'advs' object\nwith open(file_path, 'wb') as f:\n    pickle.dump(advs, f)",
+    block14: ""
+  });
+  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const { ref, inView } = useInView({ triggerOnce: true });
 
@@ -47,49 +61,30 @@ export default function GettingStartedPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } else {
-      console.error('No content found to copy!');
+      console.error("No content found to copy!");
     }
   };
 
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/api/example-code`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setCodeBlocks(data[0]);
-        setLoading(false);
-        Prism.highlightAll();
-      })
-      .catch((error) => {
-        console.error('Error fetching code content:', error);
-        setLoading(false);
-      });
-  }, []);
-
   return loading ? (
-    <Typography align={'center'}>Loading...</Typography>
+    <Typography align={"center"}>Loading...</Typography>
   ) : (
     <Box
       ref={ref}
       sx={{
         opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(50px)',
-        transition: 'all 0.6s ease',
-        width: '100%',
+        transform: inView ? "translateY(0)" : "translateY(50px)",
+        transition: "all 0.6s ease",
+        width: "100%",
         maxWidth: {
-          xs: '100%',
-          sm: '100%',
-          md: '1700px',
-          lg: '1900px',
-          xl: '2100px',
+          xs: "100%",
+          sm: "100%",
+          md: "1700px",
+          lg: "1900px",
+          xl: "2100px",
         },
-        mx: 'auto',
+        mx: "auto",
         px: 2,
-        overflow: 'hidden',
+        overflow: "hidden",
       }}
     >
       <HeroBanner
@@ -110,7 +105,7 @@ export default function GettingStartedPage() {
               <StyledCardContent>
                 <Typography
                   variant="h4"
-                  sx={{ mt: 2, mb: 2, fontWeight: 'bold' }}
+                  sx={{ mt: 2, mb: 2, fontWeight: "bold" }}
                 >
                   Setup guide
                 </Typography>
@@ -125,8 +120,8 @@ export default function GettingStartedPage() {
                 </Typography>
                 <ul
                   style={{
-                    paddingLeft: '20px',
-                    fontSize: '1.05rem',
+                    paddingLeft: "20px",
+                    fontSize: "1.05rem",
                     lineHeight: 1.7,
                   }}
                 >
@@ -159,8 +154,8 @@ export default function GettingStartedPage() {
                     href="https://colab.research.google.com/drive/1Vb6C_ImP-vfS0a9LHAPGtwSR_oB7sTdB?usp=sharing"
                     sx={{
                       mr: 2,
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
-                      fontSize: '1rem',
+                      boxShadow: "0 3px 10px rgba(0,0,0,0.2)",
+                      fontSize: "1rem",
                     }}
                   >
                     Open Google Colab (Easy)
@@ -171,11 +166,10 @@ export default function GettingStartedPage() {
                     size="large"
                     color="secondary"
                     startIcon={<DownloadIcon />}
-                    href={`${API_BASE_URL}/api/download-notebook`}
                     sx={{
                       mr: 2,
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
-                      fontSize: '1rem',
+                      boxShadow: "0 3px 10px rgba(0,0,0,0.2)",
+                      fontSize: "1rem",
                     }}
                   >
                     Download Notebook (Moderate)
@@ -186,10 +180,9 @@ export default function GettingStartedPage() {
                     size="large"
                     color="secondary"
                     startIcon={<DownloadIcon />}
-                    href={`${API_BASE_URL}/api/download-data`}
                     sx={{
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
-                      fontSize: '1rem',
+                      boxShadow: "0 3px 10px rgba(0,0,0,0.2)",
+                      fontSize: "1rem",
                     }}
                   >
                     Download DataSet (Advanced)
@@ -209,7 +202,7 @@ export default function GettingStartedPage() {
         <Grid item size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
           <StyledCard>
             <StyledCardContent>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 2 }}>
                 Local Setup (Advanced)
               </Typography>
               <Typography variant="subtitle1" sx={{ mb: 2 }}>
@@ -218,8 +211,8 @@ export default function GettingStartedPage() {
                 setting up your environment from scratch.
                 <ul
                   style={{
-                    paddingLeft: '20px',
-                    fontSize: '1.05rem',
+                    paddingLeft: "20px",
+                    fontSize: "1.05rem",
                     lineHeight: 1.7,
                   }}
                 >
@@ -237,55 +230,49 @@ export default function GettingStartedPage() {
                 setup process.
               </Typography>
               <Divider />
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
-              Step 1: Install Dependencies
-            </Typography>
-            <Divider sx={{ my: 4 }} />
-            <Typography variant="body1" fontSize={18} lineHeight={1.8}>
-              Before starting, ensure you have installed the necessary libraries for this project. Follow these steps:
-            </Typography>
-            <ul
-              style={{
-                paddingLeft: '20px',
-                fontSize: '1.05rem',
-                lineHeight: 1.7,
-              }}
-            >
-              <li>
-                Ensure you have Python installed (version 3.8 or higher).
-              </li>
-              <li>
-                Create a virtual environment to manage dependencies. You can use either <strong>Anaconda</strong> or <strong>venv</strong>:
-                <ul
-                  style={{
-                    paddingLeft: '20px',
-                    fontSize: '1.05rem',
-                    lineHeight: 1.7,
-                  }}
-                >
-                  <li>
-                    <strong>Using Anaconda</strong>:
-                    <pre style={{ backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px', overflowX: 'auto' }}>
-                      <code>conda create -n myenv python=3.8<br />conda activate myenv</code>
-                    </pre>
-                  </li>
-                  <li>
-                    <strong>Using venv</strong>:
-                    <pre style={{ backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px', overflowX: 'auto' }}>
-                      <code>python -m venv myenv<br />source myenv/bin/activate  # Linux/Mac<br />myenv\Scripts\activate  # Windows</code>
-                    </pre>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                Install the required libraries in the virtual environment by running the following commands:
-                <pre style={{ backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px', overflowX: 'auto' }}>
-                  <code>pip install robustbench<br />pip install foolbox <br /> pip install timm==1.0.9</code>
-                </pre>
-              </li>
-            </ul>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
+                Step 1: Install Dependencies
+              </Typography>
+              <Divider sx={{ my: 4 }} />
+              <Typography variant="body1" fontSize={18} lineHeight={1.8}>
+                Before starting, ensure you have installed the necessary
+                libraries for this project. Follow these steps:
+              </Typography>
+              <ul
+                style={{
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
+                  lineHeight: 1.7,
+                }}
+              >
+                <li>
+                  Ensure you have Python installed (version 3.8 or higher).
+                </li>
+                <li>
+                  Create a virtual environment to manage dependencies (optional,
+                  but recommended).
+                </li>
+                <li>
+                  Run the following commands to install the required libraries:
+                  <ul
+                    style={{
+                      paddingLeft: "20px",
+                      fontSize: "1.05rem",
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    <li>
+                      <code>RobustBench</code>: For loading pre-trained robust
+                      classifiers.
+                    </li>
+                    <li>
+                      <code>Foolbox</code>: For generating adversarial examples.
+                    </li>
+                  </ul>
+                </li>
+              </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block1}</code>
                 </pre>
@@ -295,11 +282,11 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block1)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
 
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 2: Load the Model
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -309,8 +296,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -320,8 +307,8 @@ export default function GettingStartedPage() {
                 </li>
                 <ul
                   style={{
-                    paddingLeft: '20px',
-                    fontSize: '1.05rem',
+                    paddingLeft: "20px",
+                    fontSize: "1.05rem",
                     lineHeight: 1.7,
                   }}
                 >
@@ -341,7 +328,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block2}</code>
                 </pre>
@@ -351,11 +338,11 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block2)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
 
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 3: Download the CIFAR-10 Dataset
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -365,8 +352,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -380,7 +367,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block3}</code>
                 </pre>
@@ -390,11 +377,11 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block3)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
 
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 4: Process the Data
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -404,8 +391,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -420,7 +407,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block4}</code>
                 </pre>
@@ -430,10 +417,10 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block4)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 5: Extract the Images and Labels
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -443,8 +430,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -459,7 +446,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block5}</code>
                 </pre>
@@ -469,10 +456,10 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block5)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 6: Inspect the Data
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -482,8 +469,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -497,7 +484,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block6}</code>
                 </pre>
@@ -507,10 +494,10 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block6)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 7: Load the Robust Model
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -520,8 +507,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -535,7 +522,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block7}</code>
                 </pre>
@@ -545,10 +532,10 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block7)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 8: Utilize GPU for Faster Computation
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -558,8 +545,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -575,7 +562,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block8}</code>
                 </pre>
@@ -585,10 +572,10 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block8)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 9: Set Up Foolbox for Adversarial Attacks
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -598,8 +585,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -613,7 +600,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block9}</code>
                 </pre>
@@ -623,10 +610,10 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block9)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 10: Generate Adversarial Examples
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -636,8 +623,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -649,7 +636,7 @@ export default function GettingStartedPage() {
                 <li>Record which examples successfully fool the model.</li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block10}</code>
                 </pre>
@@ -659,11 +646,11 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block10)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
 
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 11: Evaluate Model Accuracy After Attack
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -673,8 +660,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -685,7 +672,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block11}</code>
                 </pre>
@@ -695,11 +682,11 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block11)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
 
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 4 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 4 }}>
                 Step 12: Visualize the Results
               </Typography>
               <Divider sx={{ my: 4 }} />
@@ -710,8 +697,8 @@ export default function GettingStartedPage() {
               </Typography>
               <ul
                 style={{
-                  paddingLeft: '20px',
-                  fontSize: '1.05rem',
+                  paddingLeft: "20px",
+                  fontSize: "1.05rem",
                   lineHeight: 1.7,
                 }}
               >
@@ -728,7 +715,7 @@ export default function GettingStartedPage() {
                 </li>
               </ul>
 
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: "relative", mb: 4 }}>
                 <pre className="language-python">
                   <code className="language-python">{codeBlocks.block12}</code>
                 </pre>
@@ -738,7 +725,7 @@ export default function GettingStartedPage() {
                   onClick={() => handleCopy(codeBlocks.block12)}
                   sx={{ mt: 1 }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </Box>
             </StyledCardContent>
