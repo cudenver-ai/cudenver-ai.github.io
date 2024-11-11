@@ -49,6 +49,15 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   padding: '8px 12px',
 }));
 
+const Banner = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.warning.main,
+  color: theme.palette.common.white,
+  textAlign: 'center',
+  padding: theme.spacing(1),
+  fontWeight: 'bold',
+  fontSize: '16px',
+}));
+
 export default function AppNavbar({ setCurrentPage }) {
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -81,6 +90,9 @@ export default function AppNavbar({ setCurrentPage }) {
         mt: 1,
       }}
     >
+    <Banner>
+    This challenge has concluded! Thank you for participating.
+  </Banner>
       <Container maxWidth="lg">
         <StyledToolbar variant="dense">
           <Stack
@@ -103,7 +115,7 @@ export default function AppNavbar({ setCurrentPage }) {
                 component="h2"
                 sx={{ color: 'text.primary' }}
               >
-                Decoy Challenge
+                Decoy Challenge - Results
               </Typography>
 
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
